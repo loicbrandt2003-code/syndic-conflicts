@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conflits en Copropriété · Étude UNamur</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0F0F0F;
+    --surface: #161616;
+    --card: #1C1C1C;
+    --border: #2A2A2A;
+    --accent: #6DB33F;
+    --accent-soft: #89CC58;
+    --accent-dark: #4E8A28;
+    --grey: #4A4A4A;
+    --grey-light: #888888;
+    --red: #D94F3D;
+    --gold: #E8A020;
+    --green: #6DB33F;
+    --text: #F0F0F0;
+    --muted: #888888;
+    --dim: #444444;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .nav-brand { padding: 14px 0; display: flex; align-items: center; gap: 14px; }
+  .nav-brand img { height: 48px; width: auto; }
+  .nav-brand-text small { display: block; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
+  .nav-brand-text strong { font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.01em; }
+  .nav-brand-text strong span { color: var(--accent); }
+  .nav-tabs { display: flex; gap: 4px; padding: 10px 0; }
+  .nav-tab {
+    padding: 8px 18px; border-radius: 10px; border: none; cursor: pointer;
+    background: transparent; color: var(--muted); font-size: 13px; font-weight: 500;
+    font-family: 'Montserrat', sans-serif; transition: all .2s;
+  }
+  .nav-tab.active { background: var(--accent); color: #fff; font-weight: 700; }
+  .nav-tab:hover:not(.active) { background: var(--border); color: var(--text); }
+
+  /* LAYOUT */
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FORM */
+  .form-wrap { max-width: 660px; margin: 0 auto; }
+  .form-header { margin-bottom: 36px; border-left: 4px solid var(--accent); padding-left: 16px; }
+  .form-header h1 { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; line-height: 1.3; margin-bottom: 10px; letter-spacing: -.02em; }
+  .form-header p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .progress-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+  .progress-seg { flex: 1; height: 4px; border-radius: 99px; background: var(--border); transition: background .4s; }
+  .progress-seg.done { background: var(--accent); }
+  .step-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .step-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px; letter-spacing: -.01em; }
+  .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 24px; }
+  .q-label { font-size: 14px; color: var(--accent-soft); font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+  .q-block { margin-bottom: 28px; }
+  .q-block:last-child { margin-bottom: 0; }
+
+  .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
+  .choice-label {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 10px 14px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-size: 14px; transition: all .2s;
+    user-select: none;
+  }
+  .choice-label:hover { border-color: var(--accent); color: var(--text); }
+  .choice-label input { accent-color: var(--accent); }
+  .choice-label.selected { background: #6DB33F22; border-color: var(--accent); color: var(--text); }
+
+  .other-row { display: flex; align-items: center; gap: 10px; }
+  .other-input {
+    flex: 1; background: var(--border); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-size: 13px; font-family: 'Montserrat', sans-serif; outline: none;
+  }
+  .other-input:focus { border-color: var(--accent); }
+
+  .likert { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .likert-btn {
+    width: 46px; height: 46px; border-radius: 12px; border: 2px solid transparent;
+    background: var(--border); color: var(--muted); font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: all .2s; font-family: 'Montserrat', sans-serif;
+  }
+  .likert-btn:hover { border-color: #ffffff44; color: var(--text); }
+  .likert-btn.sel { transform: scale(1.12); color: #fff; border-color: transparent; }
+  .likert-btn.sel[data-v="1"] { background: #E8615A; }
+  .likert-btn.sel[data-v="2"] { background: #E8975A; }
+  .likert-btn.sel[data-v="3"] { background: #F0B429; }
+  .likert-btn.sel[data-v="4"] { background: #7ECF5B; }
+  .likert-btn.sel[data-v="5"] { background: #3ECFB2; }
+  .likert-hint { font-size: 11px; color: var(--dim); margin-left: 6px; }
+
+  .form-nav { display: flex; justify-content: space-between; }
+  .btn {
+    padding: 12px 26px; border-radius: 12px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 14px; font-family: 'Montserrat', sans-serif; transition: all .2s;
+  }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--muted); }
+  .btn-ghost:disabled { opacity: .3; cursor: default; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-soft); }
+  .btn-success { background: var(--green); color: #0A2820; }
+  .btn-success:hover { filter: brightness(1.1); }
+
+  .success-screen { text-align: center; padding: 80px 20px; }
+  .success-screen .icon { font-size: 64px; margin-bottom: 20px; }
+  .success-screen h2 { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; color: var(--green); margin-bottom: 10px; }
+  .success-screen p { color: var(--muted); }
+
+  /* DASHBOARD */
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
+  .dash-header h1 { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: -.02em; }
+  .dash-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+  .btn-outline:hover { border-color: var(--accent); }
+
+  .kpi-banner {
+    background: linear-gradient(135deg, #6DB33F22, var(--card));
+    border: 1px solid #6DB33F44; border-radius: 20px;
+    padding: 28px 32px; margin-bottom: 40px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .kpi-main { }
+  .kpi-main small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .kpi-main .big-num { font-size: 56px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .kpi-main span { font-size: 13px; color: var(--dim); }
+  .kpi-pills { display: flex; gap: 28px; flex-wrap: wrap; }
+  .kpi-pill { text-align: center; }
+  .kpi-pill .val { font-size: 30px; font-weight: 800; }
+  .kpi-pill .lbl { font-size: 11px; color: var(--muted); max-width: 90px; line-height: 1.3; }
+
+  .section { margin-bottom: 44px; }
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .section-bar { width: 4px; height: 24px; border-radius: 99px; }
+  .section-head h3 { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; border-left: 3px solid var(--accent);
+  }
+  .stat-card small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: 8px; }
+  .stat-card .val { font-size: 30px; font-weight: 800; }
+  .stat-card .sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .stat-card .icon { float: right; font-size: 26px; opacity: .6; }
+
+  .hbar { display: flex; flex-direction: column; gap: 10px; }
+  .hbar-row { }
+  .hbar-labels { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .hbar-labels span:first-child { font-size: 13px; color: var(--text); }
+  .hbar-labels span:last-child { font-size: 13px; font-weight: 700; }
+  .hbar-track { background: var(--border); border-radius: 99px; height: 7px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 99px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+  .likert-summary { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  .lscore-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lscore-label { font-size: 13px; color: var(--text); flex: 1; }
+  .lscore-right { display: flex; align-items: center; gap: 10px; }
+  .lscore-bar { width: 90px; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .lscore-fill { height: 100%; border-radius: 99px; transition: width .6s; }
+  .lscore-val { font-weight: 700; font-size: 15px; min-width: 28px; text-align: right; }
+
+  .insight-box {
+    background: #3ECFB211; border: 1px solid #3ECFB233;
+    border-radius: 14px; padding: 20px; margin-top: 20px;
+  }
+  .insight-box strong { color: var(--green); font-size: 14px; display: block; margin-bottom: 8px; }
+  .insight-box p { color: var(--text); font-size: 14px; line-height: 1.7; }
+
+  .empty-state { text-align: center; padding: 80px 20px; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h2 { color: var(--muted); font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .empty-state p { color: var(--dim); font-size: 14px; margin-bottom: 24px; }
+
+  /* RAW DATA TABLE */
+  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { padding: 12px 14px; background: var(--card); color: var(--muted); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:hover { background: var(--border); }
+  tbody td { padding: 9px 14px; color: var(--text); }
+  .tag { display: inline-block; border-radius: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    nav { padding: 0 16px; }
+    main { padding: 24px 16px 60px; }
+    .kpi-banner { padding: 20px; }
+    .kpi-main .big-num { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <img src="data:image/png;base64,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UsqzLIIiKhIREQBERAECIEB01oO9zK19M3pnqbKE6DvcytfTN6Z6myhOg73MrX0zemepsvm+0O1VPif1OTuuunzYREWoYArl6myubqXm2ud2QdHUMHMQWnyNVNKY6HLwLPj2iMj9WGrzpZNuzs8tX/cG+Fb+y6yo3cJPdnHjobNnU83Xi3/ALk6XREX0Q6oLWYqtTL3hyvtT8gKqB0bSeJ2XYnvHIrZoqzgpxcXuZEkpLDOO6iGWnnkgnYY5onlkjTva4HIjwrzVsaeMHSUtc7FFviJppyBWtaPyb9wf0HYDz9KqdfN7y1na1nTlw/VHJ16MqM3BhERaxhCIiAL1pYTPUMiA3nbzDjXkpPbLW+ioTUVDdWeUbGnexvJ0lehsyyd3XUfwrV8v8mzaW7r1EuHE4m0ibNIOIgPjWp9K5W0FU2kX3QsRfrWp9K5WyFtQMrCIiuQEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAERAgLy0V4AwpfMDUFzudsM9VKZNd/DyNzykc0bA4DcApR61WBviY/SpvvpoO9zK19M3pnqbLgb6+uYXNSMajSTfF95zNxcVY1ZJSe98SE+tVgb4mP0qb76etVgb4mP0qb76myLV+8Lr8yXizD9qre2/EhPrVYG+Jj9Km++nrVYG+Jj9Km++psifeF1+ZLxY+1VvbfiQ=" alt="UNamur" style="height:44px;width:auto;"/>
+    <div class="nav-brand-text">
+      <small>Étude qualitative · UNamur</small>
+      <strong>Conflits en copropriété <span>· Syndics</span></strong>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('form')">📝 Questionnaire</button>
+    <button class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard">📊 Analyse (0)</button>
+    <button class="nav-tab" onclick="showPage('data')" id="tab-data">🗃️ Données</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ═══ PAGE FORM ═══ -->
+  <div id="page-form" class="page active">
+    <div class="form-wrap">
+      <div class="form-header">
+        <h1>Les conflits dans la gestion journalière d'un syndic</h1>
+        <p>Questionnaire destiné aux professionnels de la gestion de copropriété. Vos réponses alimentent l'analyse statistique en temps réel.</p>
+      </div>
+      <div class="progress-bar" id="progress-bar"></div>
+      <div class="step-label" id="step-label"></div>
+      <div class="step-title" id="step-title"></div>
+      <div id="form-content"></div>
+      <div class="form-nav">
+        <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()" disabled>← Précédent</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE DASHBOARD ═══ -->
+  <div id="page-dashboard" class="page">
+    <div id="dashboard-content"></div>
+  </div>
+
+  <!-- ═══ PAGE DATA ═══ -->
+  <div id="page-data" class="page">
+    <div class="dash-header">
+      <div><h1>Données brutes</h1><p id="data-count">Aucune réponse</p></div>
+      <button class="btn btn-outline btn-outline" onclick="exportCSV()">⬇ Exporter CSV</button>
+    </div>
+    <div class="table-wrap"><div id="table-content"><p style="padding:40px;color:var(--muted);text-align:center">Aucune donnée pour l'instant.</p></div></div>
+  </div>
+
+</main>
+
+<footer style="border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;gap:12px;margin-top:40px">
+  <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/wAARCAAoACgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAUCBAYBB//EACgQAAIBBAIBBAIDAQAAAAAAAAECAwAEBREhBhIxQVFhEyJxgZH/xAAYAQADAQEAAAAAAAAAAAAAAAACAwQBBf/EAB8RAAIDAQADAQEAAAAAAAAAAAABAgMREiExUf/aAAwDAQACEQMRAD8A6bq2tWmkWTXd5OIoVOAcZJPYADzWUsPiHQr2by4r9I3P7JgUE/Oc1y/ilqeoarcJZ6jM0kMLBkQHCqwBH+K5BFHM+xEob+wzRhiqYbMR0rU9P1a0F1YXcV1CT9yNs4PkH2PzRq4R4c1bVoJbzT4IrmKMkMglCuuDj6T5qeP1s7tDyaFzWNPvJl2T21tYWmRPGZN4AK7T5NdJvvFXh9LOR0vo5WCkhY+4n4FcS4S4Vj17bLNLNb+m+YlMHcCQCfI9KmcTWMfh7VLvT7N5BawOY1Zy20kD5/dRxvJdDmMR7Bpp+u6fqoK2d0jSgbnjPDj8ioelzQ6rpUd5avvikzj2IPkfis7wa0cGlzXDx/4pCQ2DyEGMD8Zz+a8cM3/o2eqwWV35dpLKfR+N3I+1e4+nCfkPpHN6VYh1LQ9Sv2t7K9gnlVS21G5wPJH8ViL7w5rOn3LW81hO7qMl4VLqfoitNoPxNdWKw6tAtwnYzRgK3/AEOf8/mr06lZ3GPs3ULc/wAblf8AlIbHDkpRbXJFJeqnpesWGqKTZXUcpX6lBwy/UcEVoVzPw94ci0i3mnklE97cZEsmMKB7KO1dMrpJ5Sbt5LPDXgAAAAAAAAA//2Q==" alt="UNamur" style="height:32px;opacity:.6"/>
+  <span style="font-size:11px;color:var(--dim);font-family:'Montserrat',sans-serif;font-weight:500">Étude réalisée dans le cadre du programme UNamur · Tous droits réservés</span>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const responses = [];
+let currentStep = 0;
+const formData = {
+  syndicName: '',
+  years: '', conflictTypes: [], conflictTypesOther: '',
+  q3: 0, q4: 0, q5: 0, q6: 0,
+  expectations: [], expectationsOther: '',
+  q8: '', agTensions: '', agTriggers: [], agTriggersOther: '',
+  unjustifiedReproaches: '', reproachesFocus: [], reproachesFocusOther: '',
+  personalAttack: '', borderlineBehavior: '',
+  impactAreas: [], conflictCosts: [], conflictCostsOther: '',
+  missingTools: [], missingToolsOther: ''
+};
+
+// ══════════════════════════════════════════════
+//  STEP DEFINITIONS
+// ══════════════════════════════════════════════
+const STEPS = [
+  {
+    title: "Profil syndic",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q0 — Nom de votre société de syndic</div>
+          <input class="other-input" style="width:100%;margin-top:4px;opacity:1;cursor:text"
+            placeholder="Ex: Syndic Dupont & Associés..."
+            value="${formData.syndicName||''}"
+            oninput="formData.syndicName=this.value"
+            onclick="event.stopPropagation()"/>
+        </div>
+        <div class="q-label">Q1 — Depuis combien d'années exercez-vous en tant que syndic ?</div>
+        ${radioGroup('years', ['Moins de 5 ans','5-10 ans','+ 10 ans'])}
+      </div>`
+  },
+  {
+    title: "Types de conflits",
+    render: () => `
+      <div class="form-card">
+        <div class="q-label">Q2 — Quels types de conflits rencontrez-vous le plus souvent ?</div>
+        ${checkGroup('conflictTypes', [
+          'Entre copropriétaires (voisinage, nuisances, incivilités)',
+          'Entre copropriétaires et syndic',
+          'Entre copropriétaires et prestataires (plombier, peintre, chauffagiste...)'
+        ], 'conflictTypesOther')}
+      </div>`
+  },
+  {
+    title: "Perception des copropriétaires",
+    render: () => `
+      <div class="form-card">
+        ${likertQ('q3','Q3 — Les copropriétaires expriment clairement leur véritable besoin.')}
+        ${likertQ('q4','Q4 — Les demandes formulées ne correspondent pas toujours au besoin réel.')}
+        ${likertQ('q5','Q5 — Les copropriétaires cherchent avant tout à être écoutés et pris en charge.')}
+        ${likertQ('q6','Q6 — Les copropriétaires attendent principalement une solution immédiate.')}
+      </div>`
+  },
+  {
+    title: "Attentes & Besoins",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q7 — Les copropriétaires attendent principalement :</div>
+          ${checkGroup('expectations', ['Une solution rapide','Une reconnaissance de leur problème','Une écoute attentive','Une justification rationnelle'], 'expectationsOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q8 — Avez-vous déjà eu le sentiment qu'un conflit s'envenime parce qu'un copropriétaire a mal exprimé son besoin ?</div>
+          ${radioGroup('q8', ['Oui','Non'])}
+        </div>
+      </div>`
+  },
+  {
+    title: "Assemblées Générales",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q9 — Les Assemblées Générales sont-elles une source importante de tensions ?</div>
+          ${radioGroup('agTensions', ['Rarement','Occasionnellement','Fréquemment','Presque toujours'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q10 — Qu'est-ce qui déclenche le plus de tensions en AG ?</div>
+          ${checkGroup('agTriggers', ['Travaux','Charges','Confiance envers le syndic','Communication','Décisions mal comprises','Durée'], 'agTriggersOther')}
+        </div>
+      </div>`
+  },
+  {
+    title: "Reproches & Ressenti",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q11 — Vous arrive-t-il de recevoir des reproches que vous estimez injustifiés ?</div>
+          ${radioGroup('unjustifiedReproaches', ['Jamais','Parfois','Fréquemment','Presque toujours'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q12 — Ces reproches portent principalement sur :</div>
+          ${checkGroup('reproachesFocus', ['Votre temps de réaction','Votre disponibilité','Votre communication','La transparence','Le manque de solutions','La procédure en elle-même'], 'reproachesFocusOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q13 — Vous arrive-t-il de vous sentir personnellement attaqué(e) ?</div>
+          ${radioGroup('personalAttack', ['Oui','Non'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q14 — Avez-vous déjà eu le sentiment que certains conflits entrainent des comportements à la limite de la correction ?</div>
+          ${radioGroup('borderlineBehavior', ['Oui','Non'])}
+        </div>
+      </div>`
+  },
+  {
+    title: "Impact & Besoins non adressés",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q15 — Les conflits impactent :</div>
+          ${checkGroup('impactAreas', ['Votre charge mentale','La motivation de votre équipe','La relation client','La rentabilité','Votre image'], null)}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q16 — Les conflits génèrent souvent :</div>
+          ${checkGroup('conflictCosts', ['Des heures non facturables','Des frais juridiques','Des tensions internes','Des pertes de clients'], 'conflictCostsOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q17 — Qu'est-ce qui vous manque actuellement pour gérer les conflits ?</div>
+          ${checkGroup('missingTools', ['Du temps','Une procédure clairement définie','Des outils structurés','Des connaissances en gestion de conflits','Un conciliateur'], 'missingToolsOther')}
+        </div>
+      </div>`
+  }
+];
+
+// ══════════════════════════════════════════════
+//  FORM BUILDERS
+// ══════════════════════════════════════════════
+function radioGroup(key, options) {
+  return `<div class="radio-group">${options.map(v => `
+    <label class="choice-label ${formData[key]===v?'selected':''}" onclick="setRadio('${key}','${v}',this)">
+      <input type="radio" name="${key}" value="${v}" ${formData[key]===v?'checked':''}> ${v}
+    </label>`).join('')}</div>`;
+}
+
+function checkGroup(key, options, otherKey) {
+  const arr = formData[key] || [];
+  let html = `<div class="check-group">${options.map(v => `
+    <label class="choice-label ${arr.includes(v)?'selected':''}" onclick="toggleCheck('${key}','${v}',this)">
+      <input type="checkbox" value="${v}" ${arr.includes(v)?'checked':''}> ${v}
+    </label>`).join('')}`;
+  if (otherKey) {
+    const hasOther = arr.includes('Autre');
+    html += `
+    <div class="other-row">
+      <label class="choice-label ${hasOther?'selected':''}" onclick="toggleCheck('${key}','Autre',this)" style="white-space:nowrap">
+        <input type="checkbox" value="Autre" ${hasOther?'checked':''}> Autre :
+      </label>
+      <input class="other-input" placeholder="Précisez..." value="${formData[otherKey]||''}"
+        oninput="formData['${otherKey}']=this.value"
+        onclick="event.stopPropagation()"
+        style="opacity:${hasOther?'1':'0.4'};cursor:${hasOther?'text':'not-allowed'}"
+        id="other-${otherKey}"/>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function likertQ(key, label) {
+  return `<div class="q-block">
+    <div class="q-label">${label}</div>
+    <div class="likert">
+      ${[1,2,3,4,5].map(n => `
+        <button class="likert-btn ${formData[key]===n?'sel':''}" data-v="${n}"
+          onclick="setLikert('${key}',${n},this)">${n}</button>`).join('')}
+      <span class="likert-hint">1 = Pas du tout d'accord · 5 = Totalement d'accord</span>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  FORM INTERACTION
+// ══════════════════════════════════════════════
+function setRadio(key, val, el) {
+  formData[key] = val;
+  el.closest('.radio-group').querySelectorAll('.choice-label').forEach(l => l.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleCheck(key, val, el) {
+  const arr = formData[key] || (formData[key] = []);
+  const idx = arr.indexOf(val);
+  if (idx >= 0) { arr.splice(idx, 1); el.classList.remove('selected'); }
+  else { arr.push(val); el.classList.add('selected'); }
+  // update "Autre" input styling
+  if (val === 'Autre') {
+    const otherInputs = document.querySelectorAll('.other-input');
+    otherInputs.forEach(inp => {
+      const isActive = arr.includes('Autre');
+      inp.style.opacity = isActive ? '1' : '0.4';
+      inp.style.cursor = isActive ? 'text' : 'not-allowed';
+    });
+  }
+}
+
+function setLikert(key, val, el) {
+  formData[key] = val;
+  el.closest('.likert').querySelectorAll('.likert-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ══════════════════════════════════════════════
+//  STEP NAV
+// ══════════════════════════════════════════════
+function renderStep() {
+  const n = STEPS.length;
+  // progress
+  const pb = document.getElementById('progress-bar');
+  pb.innerHTML = Array.from({length: n}, (_,i) =>
+    `<div class="progress-seg ${i<=currentStep?'done':''}"></div>`).join('');
+  document.getElementById('step-label').textContent = `Étape ${currentStep+1} / ${n}`;
+  document.getElementById('step-title').textContent = STEPS[currentStep].title;
+  document.getElementById('form-content').innerHTML = STEPS[currentStep].render();
+  document.getElementById('btn-prev').disabled = currentStep === 0;
+  const btnNext = document.getElementById('btn-next');
+  if (currentStep === n - 1) {
+    btnNext.textContent = '✓ Soumettre';
+    btnNext.className = 'btn btn-success';
+    btnNext.onclick = submitForm;
+  } else {
+    btnNext.textContent = 'Suivant →';
+    btnNext.className = 'btn btn-primary';
+    btnNext.onclick = nextStep;
+  }
+}
+
+function nextStep() { if (currentStep < STEPS.length - 1) { currentStep++; renderStep(); } }
+function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
+
+function submitForm() {
+  responses.push(JSON.parse(JSON.stringify(formData)));
+  // reset
+  Object.assign(formData, {
+    syndicName: '',
+    years:'', conflictTypes:[], conflictTypesOther:'',
+    q3:0, q4:0, q5:0, q6:0,
+    expectations:[], expectationsOther:'',
+    q8:'', agTensions:'', agTriggers:[], agTriggersOther:'',
+    unjustifiedReproaches:'', reproachesFocus:[], reproachesFocusOther:'',
+    personalAttack:'', borderlineBehavior:'',
+    impactAreas:[], conflictCosts:[], conflictCostsOther:'',
+    missingTools:[], missingToolsOther:''
+  });
+  currentStep = 0;
+  updateNavCounts();
+  // success screen
+  document.getElementById('form-content').innerHTML = `
+    <div class="success-screen">
+      <div class="icon">✅</div>
+      <h2>Réponse enregistrée !</h2>
+      <p>Redirection vers le tableau de bord…</p>
+    </div>`;
+  document.getElementById('step-label').textContent = '';
+  document.getElementById('step-title').textContent = '';
+  document.getElementById('progress-bar').innerHTML = '';
+  document.getElementById('btn-prev').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  setTimeout(() => {
+    document.getElementById('btn-prev').style.display = '';
+    document.getElementById('btn-next').style.display = '';
+    renderStep();
+    showPage('dashboard');
+  }, 2000);
+}
+
+// ══════════════════════════════════════════════
+//  PAGE SWITCHING
+// ══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const tabMap = {form:0, dashboard:1, data:2};
+  document.querySelectorAll('.nav-tab')[tabMap[id]].classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'data') renderTable();
+}
+
+function updateNavCounts() {
+  document.getElementById('tab-dashboard').textContent = `📊 Analyse (${responses.length})`;
+  document.getElementById('tab-data').textContent = `🗃️ Données (${responses.length})`;
+  document.getElementById('data-count').textContent =
+    responses.length ? `${responses.length} réponse${responses.length>1?'s':''} collectée${responses.length>1?'s':''}` : 'Aucune réponse';
+}
+
+// ══════════════════════════════════════════════
+//  STATS HELPERS
+// ══════════════════════════════════════════════
+function avg(key) {
+  if (!responses.length) return 0;
+  return responses.reduce((s,r) => s + (r[key]||0), 0) / responses.length;
+}
+function pct(pred) {
+  if (!responses.length) return 0;
+  return Math.round(responses.filter(pred).length / responses.length * 100);
+}
+function countValues(key) {
+  const map = {};
+  responses.forEach(r => {
+    const v = r[key];
+    if (Array.isArray(v)) v.forEach(x => { map[x] = (map[x]||0)+1; });
+    else if (v) map[v] = (map[v]||0)+1;
+  });
+  return Object.entries(map).sort((a,b) => b[1]-a[1]);
+}
+function hbar(data, color, total) {
+  if (!data.length) return '<p style="color:var(--dim);font-size:13px">Pas encore de données.</p>';
+  const t = total || responses.length;
+  return `<div class="hbar">${data.map(([label, count]) => {
+    const p = t ? Math.round(count/t*100) : 0;
+    return `<div class="hbar-row">
+      <div class="hbar-labels"><span>${label}</span><span style="color:${color}">${p}%</span></div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${p}%;background:${color}"></div></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function lscoreRow(label, val) {
+  const p = (val/5)*100;
+  const color = p < 40 ? 'var(--red)' : p < 70 ? 'var(--gold)' : 'var(--green)';
+  return `<div class="lscore-row">
+    <span class="lscore-label">${label}</span>
+    <div class="lscore-right">
+      <div class="lscore-bar"><div class="lscore-fill" style="width:${p}%;background:${color}"></div></div>
+      <span class="lscore-val" style="color:${color}">${val.toFixed(1)}</span>
+    </div>
+  </div>`;
+}
+function statCard(label, val, icon, color, sub) {
+  return `<div class="stat-card" style="border-left-color:${color}">
+    <span class="icon">${icon}</span>
+    <small>${label}</small>
+    <div class="val" style="color:${color}">${val}</div>
+    ${sub ? `<div class="sub">${sub}</div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  DASHBOARD RENDER
+// ══════════════════════════════════════════════
+function renderDashboard() {
+  const n = responses.length;
+  const el = document.getElementById('dashboard-content');
+
+  if (!n) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="icon">📭</div>
+      <h2>Aucune réponse encore</h2>
+      <p>Remplissez le questionnaire pour voir les statistiques apparaître ici.</p>
+      <button class="btn btn-primary" onclick="showPage('form')">Remplir le questionnaire</button>
+    </div>`;
+    return;
+  }
+
+  const pctAttack   = pct(r => r.personalAttack === 'Oui');
+  const pctBorder   = pct(r => r.borderlineBehavior === 'Oui');
+  const pctBadExpr  = pct(r => r.q8 === 'Oui');
+  const pctConc     = pct(r => (r.missingTools||[]).includes('Un conciliateur'));
+  const pctProcedure= pct(r => (r.missingTools||[]).includes('Une procédure clairement définie'));
+  const pctKnow     = pct(r => (r.missingTools||[]).includes('Des connaissances en gestion de conflits'));
+
+  const impactTop2 = countValues('impactAreas').slice(0,2).map(([l])=>l.toLowerCase());
+
+  el.innerHTML = `
+    <!-- KPI Banner -->
+    <div class="dash-header">
+      <div><h1>Tableau de bord analytique</h1><p>${n} réponse${n>1?'s':''} · Données en temps réel</p></div>
+      <button class="btn btn-outline" onclick="exportCSV()">⬇ Exporter CSV</button>
+    </div>
+    <div class="kpi-banner">
+      <div class="kpi-main">
+        <small>Répondants</small>
+        <div class="big-num">${n}</div>
+        <span>syndics interrogés</span>
+      </div>
+      <div class="kpi-pills">
+        <div class="kpi-pill"><div class="val" style="color:var(--red)">${pctAttack}%</div><div class="lbl">Se sentent attaqués</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--gold)">${pctBorder}%</div><div class="lbl">Comportements limites</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--accent-soft)">${pctBadExpr}%</div><div class="lbl">Besoin mal exprimé</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--green)">${pctConc}%</div><div class="lbl">Veulent un conciliateur</div></div>
+      </div>
+    </div>
+
+    <!-- 1. Profil -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--accent-soft)"></div><h3>1. Profil des répondants</h3></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Syndics ayant répondu</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        ${responses.map((r,i) => `<span style="background:var(--border);border-radius:8px;padding:4px 12px;font-size:12px;color:var(--accent-soft)">${r.syndicName||'Anonyme #'+(i+1)}</span>`).join('')}
+      </div>
+      ${hbar(countValues('years'), 'var(--accent-soft)')}
+    </div>
+
+    <!-- 2. Sources de conflits -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--red)"></div><h3>2. Principales sources de conflits</h3></div>
+      ${hbar(countValues('conflictTypes'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">🏛️ Fréquence des tensions en AG</p>
+        ${hbar(countValues('agTensions'), 'var(--gold)')}
+      </div>
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">⚡ Déclencheurs de tensions en AG</p>
+        ${hbar(countValues('agTriggers'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 3. Gestion actuelle -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--gold)"></div><h3>3. Comment ces conflits sont gérés aujourd'hui</h3></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Alignement perception / réalité (échelle 1–5)</p>
+      <div class="likert-summary">
+        ${lscoreRow("Clarté d'expression des besoins (Q3)", avg('q3'))}
+        ${lscoreRow("Décalage demande / besoin réel (Q4)", avg('q4'))}
+        ${lscoreRow("Besoin d'écoute avant tout (Q5)", avg('q5'))}
+        ${lscoreRow("Attente d'une solution immédiate (Q6)", avg('q6'))}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Fréquence des reproches injustifiés</p>
+      ${hbar(countValues('unjustifiedReproaches'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Portée des reproches</p>
+        ${hbar(countValues('reproachesFocus'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 4. Conséquences -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--red)"></div><h3>4. Conséquences sur le travail des syndics</h3></div>
+      <div class="card-grid">
+        ${statCard('Se sentent attaqués personnellement', pctAttack+'%', '😤', 'var(--red)', 'des répondants')}
+        ${statCard('Comportements limites vécus', pctBorder+'%', '⚠️', 'var(--gold)', 'des répondants')}
+        ${statCard('Conflit aggravé par besoin mal exprimé', pctBadExpr+'%', '💬', 'var(--accent-soft)', 'ont répondu Oui')}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Domaines impactés</p>
+      ${hbar(countValues('impactAreas'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Coûts générés par les conflits</p>
+        ${hbar(countValues('conflictCosts'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 5. Besoins non adressés -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--green)"></div><h3>5. Besoins peu ou mal adressés</h3></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ce qui manque actuellement</p>
+      ${hbar(countValues('missingTools'), 'var(--green)')}
+      <div class="card-grid" style="margin-top:24px">
+        ${statCard('Souhaitent un conciliateur', pctConc+'%', '🤝', 'var(--green)', 'besoin clé identifié')}
+        ${statCard('Manque de procédure définie', pctProcedure+'%', '📋', 'var(--accent-soft)', 'besoin structurel')}
+        ${statCard('Manque de formation conflits', pctKnow+'%', '📚', 'var(--gold)', 'besoin de compétences')}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Attentes des copropriétaires selon les syndics</p>
+      ${hbar(countValues('expectations'), 'var(--green)')}
+      <div class="insight-box">
+        <strong>💡 Insight principal</strong>
+        <p>${pctConc > 50
+          ? `Plus de la moitié des syndics (${pctConc}%) expriment le besoin d'un conciliateur externe — un signal fort pour la pertinence d'un service de médiation.`
+          : `${pctConc}% des répondants mentionnent le besoin d'un conciliateur, à combiner avec les autres besoins structurels identifiés.`}
+          ${impactTop2.length ? ` Les conflits impactent en priorité : ${impactTop2.join(' et ')}.` : ''}</p>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  RAW TABLE
+// ══════════════════════════════════════════════
+function renderTable() {
+  const el = document.getElementById('table-content');
+  if (!responses.length) {
+    el.innerHTML = '<p style="padding:40px;color:var(--muted);text-align:center">Aucune donnée pour l\'instant.</p>';
+    return;
+  }
+  const cols = ['#','Syndic','Expérience','Types conflits','Q3','Q4','Q5','Q6','Attentes','AG','Attaqué','Limites','Supprimer'];
+  el.innerHTML = `<table>
+    <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${responses.map((r,i) => {
+      const scoreColor = v => v>=4?'var(--green)':v>=3?'var(--gold)':'var(--red)';
+      const tag = (v, yes='Oui') => `<span class="tag" style="background:${v===yes?'#E8615A22':'#3ECFB222'};color:${v===yes?'var(--red)':'var(--green)'}">${v||'—'}</span>`;
+      return `<tr>
+        <td style="color:var(--dim)">${i+1}</td>
+        <td style="font-weight:600;color:var(--accent-soft)">${r.syndicName||'—'}</td>
+        <td>${r.years||'—'}</td>
+        <td style="max-width:180px">${(r.conflictTypes||[]).join(', ').substring(0,55)||'—'}</td>
+        ${['q3','q4','q5','q6'].map(k => `<td style="text-align:center;font-weight:700;color:${scoreColor(r[k])}">${r[k]||'—'}</td>`).join('')}
+        <td style="max-width:160px">${(r.expectations||[]).join(', ').substring(0,50)||'—'}</td>
+        <td>${r.agTensions||'—'}</td>
+        <td>${tag(r.personalAttack)}</td>
+        <td>${tag(r.borderlineBehavior)}</td>
+        <td style="text-align:center">
+          <button onclick="deleteResponse(${i})" title="Supprimer cette réponse"
+            style="background:#E8615A22;border:1px solid #E8615A44;color:var(--red);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;">
+            🗑 Suppr.
+          </button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ══════════════════════════════════════════════
+//  DELETE RESPONSE
+// ══════════════════════════════════════════════
+function deleteResponse(idx) {
+  if (!confirm(`Supprimer la réponse #${idx+1} (${responses[idx].syndicName||'Sans nom'}) ?`)) return;
+  responses.splice(idx, 1);
+  updateNavCounts();
+  renderTable();
+  // refresh dashboard if visible
+  if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+}
+
+// ══════════════════════════════════════════════
+//  CSV EXPORT
+// ══════════════════════════════════════════════
+function exportCSV() {
+  if (!responses.length) { alert('Aucune donnée à exporter.'); return; }
+  const keys = Object.keys(responses[0]);
+  const header = keys.join(';');
+  const rows = responses.map(r =>
+    keys.map(k => {
+      const v = r[k];
+      return Array.isArray(v) ? `"${v.join(', ')}"` : `"${v||''}"`;
+    }).join(';')
+  );
+  const csv = '\uFEFF' + [header, ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'syndic_conflits_donnees.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+renderStep();
+</script>
+</body>
+</html>
