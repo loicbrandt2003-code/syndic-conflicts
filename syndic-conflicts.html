@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conflits en Copropriété · Étude Syndics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0B0D12;
+    --surface: #111318;
+    --card: #161A26;
+    --border: #222638;
+    --accent: #5B73F5;
+    --accent-soft: #7B8EFF;
+    --gold: #F0B429;
+    --red: #E8615A;
+    --green: #3ECFB2;
+    --text: #EDF0FA;
+    --muted: #6E7898;
+    --dim: #3A4060;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .nav-brand { padding: 18px 0; }
+  .nav-brand small { display: block; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .12em; }
+  .nav-brand strong { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--text); }
+  .nav-brand strong span { color: var(--accent); }
+  .nav-tabs { display: flex; gap: 4px; padding: 10px 0; }
+  .nav-tab {
+    padding: 8px 18px; border-radius: 10px; border: none; cursor: pointer;
+    background: transparent; color: var(--muted); font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; transition: all .2s;
+  }
+  .nav-tab.active { background: var(--accent); color: #fff; font-weight: 700; }
+  .nav-tab:hover:not(.active) { background: var(--border); color: var(--text); }
+
+  /* LAYOUT */
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FORM */
+  .form-wrap { max-width: 660px; margin: 0 auto; }
+  .form-header { margin-bottom: 36px; }
+  .form-header h1 { font-family: 'Playfair Display', serif; font-size: 26px; line-height: 1.3; margin-bottom: 10px; }
+  .form-header p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .progress-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+  .progress-seg { flex: 1; height: 4px; border-radius: 99px; background: var(--border); transition: background .4s; }
+  .progress-seg.done { background: var(--accent); }
+  .step-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+  .step-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 24px; }
+  .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 24px; }
+  .q-label { font-size: 14px; color: var(--accent-soft); font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+  .q-block { margin-bottom: 28px; }
+  .q-block:last-child { margin-bottom: 0; }
+
+  .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
+  .choice-label {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 10px 14px; border-radius: 10px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-size: 14px; transition: all .2s;
+    user-select: none;
+  }
+  .choice-label:hover { border-color: var(--accent); color: var(--text); }
+  .choice-label input { accent-color: var(--accent); }
+  .choice-label.selected { background: #5B73F522; border-color: var(--accent); color: var(--text); }
+
+  .other-row { display: flex; align-items: center; gap: 10px; }
+  .other-input {
+    flex: 1; background: var(--border); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none;
+  }
+  .other-input:focus { border-color: var(--accent); }
+
+  .likert { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .likert-btn {
+    width: 46px; height: 46px; border-radius: 12px; border: 2px solid transparent;
+    background: var(--border); color: var(--muted); font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif;
+  }
+  .likert-btn:hover { border-color: #ffffff44; color: var(--text); }
+  .likert-btn.sel { transform: scale(1.12); color: #fff; border-color: transparent; }
+  .likert-btn.sel[data-v="1"] { background: #E8615A; }
+  .likert-btn.sel[data-v="2"] { background: #E8975A; }
+  .likert-btn.sel[data-v="3"] { background: #F0B429; }
+  .likert-btn.sel[data-v="4"] { background: #7ECF5B; }
+  .likert-btn.sel[data-v="5"] { background: #3ECFB2; }
+  .likert-hint { font-size: 11px; color: var(--dim); margin-left: 6px; }
+
+  .form-nav { display: flex; justify-content: space-between; }
+  .btn {
+    padding: 12px 26px; border-radius: 12px; border: none; cursor: pointer;
+    font-weight: 700; font-size: 14px; font-family: 'DM Sans', sans-serif; transition: all .2s;
+  }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--muted); }
+  .btn-ghost:disabled { opacity: .3; cursor: default; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-soft); }
+  .btn-success { background: var(--green); color: #0A2820; }
+  .btn-success:hover { filter: brightness(1.1); }
+
+  .success-screen { text-align: center; padding: 80px 20px; }
+  .success-screen .icon { font-size: 64px; margin-bottom: 20px; }
+  .success-screen h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--green); margin-bottom: 10px; }
+  .success-screen p { color: var(--muted); }
+
+  /* DASHBOARD */
+  .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; flex-wrap: wrap; gap: 16px; }
+  .dash-header h1 { font-family: 'Playfair Display', serif; font-size: 26px; }
+  .dash-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 13px; }
+  .btn-outline:hover { border-color: var(--accent); }
+
+  .kpi-banner {
+    background: linear-gradient(135deg, #5B73F522, var(--card));
+    border: 1px solid #5B73F544; border-radius: 20px;
+    padding: 28px 32px; margin-bottom: 40px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .kpi-main { }
+  .kpi-main small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .kpi-main .big-num { font-size: 56px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .kpi-main span { font-size: 13px; color: var(--dim); }
+  .kpi-pills { display: flex; gap: 28px; flex-wrap: wrap; }
+  .kpi-pill { text-align: center; }
+  .kpi-pill .val { font-size: 30px; font-weight: 800; }
+  .kpi-pill .lbl { font-size: 11px; color: var(--muted); max-width: 90px; line-height: 1.3; }
+
+  .section { margin-bottom: 44px; }
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .section-bar { width: 4px; height: 24px; border-radius: 99px; }
+  .section-head h3 { font-family: 'Playfair Display', serif; font-size: 18px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; border-left: 3px solid var(--accent);
+  }
+  .stat-card small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: 8px; }
+  .stat-card .val { font-size: 30px; font-weight: 800; }
+  .stat-card .sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .stat-card .icon { float: right; font-size: 26px; opacity: .6; }
+
+  .hbar { display: flex; flex-direction: column; gap: 10px; }
+  .hbar-row { }
+  .hbar-labels { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .hbar-labels span:first-child { font-size: 13px; color: var(--text); }
+  .hbar-labels span:last-child { font-size: 13px; font-weight: 700; }
+  .hbar-track { background: var(--border); border-radius: 99px; height: 7px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 99px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+
+  .likert-summary { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  .lscore-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lscore-label { font-size: 13px; color: var(--text); flex: 1; }
+  .lscore-right { display: flex; align-items: center; gap: 10px; }
+  .lscore-bar { width: 90px; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .lscore-fill { height: 100%; border-radius: 99px; transition: width .6s; }
+  .lscore-val { font-weight: 700; font-size: 15px; min-width: 28px; text-align: right; }
+
+  .insight-box {
+    background: #3ECFB211; border: 1px solid #3ECFB233;
+    border-radius: 14px; padding: 20px; margin-top: 20px;
+  }
+  .insight-box strong { color: var(--green); font-size: 14px; display: block; margin-bottom: 8px; }
+  .insight-box p { color: var(--text); font-size: 14px; line-height: 1.7; }
+
+  .empty-state { text-align: center; padding: 80px 20px; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h2 { color: var(--muted); font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; }
+  .empty-state p { color: var(--dim); font-size: 14px; margin-bottom: 24px; }
+
+  /* RAW DATA TABLE */
+  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th { padding: 12px 14px; background: var(--card); color: var(--muted); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:hover { background: var(--border); }
+  tbody td { padding: 9px 14px; color: var(--text); }
+  .tag { display: inline-block; border-radius: 6px; padding: 2px 10px; font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    nav { padding: 0 16px; }
+    main { padding: 24px 16px 60px; }
+    .kpi-banner { padding: 20px; }
+    .kpi-main .big-num { font-size: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <small>Étude qualitative</small>
+    <strong>Conflits en copropriété <span>· Syndics</span></strong>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('form')">📝 Questionnaire</button>
+    <button class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard">📊 Analyse (0)</button>
+    <button class="nav-tab" onclick="showPage('data')" id="tab-data">🗃️ Données</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ═══ PAGE FORM ═══ -->
+  <div id="page-form" class="page active">
+    <div class="form-wrap">
+      <div class="form-header">
+        <h1>Les conflits dans la gestion journalière d'un syndic</h1>
+        <p>Questionnaire destiné aux professionnels de la gestion de copropriété. Vos réponses alimentent l'analyse statistique en temps réel.</p>
+      </div>
+      <div class="progress-bar" id="progress-bar"></div>
+      <div class="step-label" id="step-label"></div>
+      <div class="step-title" id="step-title"></div>
+      <div id="form-content"></div>
+      <div class="form-nav">
+        <button class="btn btn-ghost" id="btn-prev" onclick="prevStep()" disabled>← Précédent</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE DASHBOARD ═══ -->
+  <div id="page-dashboard" class="page">
+    <div id="dashboard-content"></div>
+  </div>
+
+  <!-- ═══ PAGE DATA ═══ -->
+  <div id="page-data" class="page">
+    <div class="dash-header">
+      <div><h1>Données brutes</h1><p id="data-count">Aucune réponse</p></div>
+      <button class="btn btn-outline btn-outline" onclick="exportCSV()">⬇ Exporter CSV</button>
+    </div>
+    <div class="table-wrap"><div id="table-content"><p style="padding:40px;color:var(--muted);text-align:center">Aucune donnée pour l'instant.</p></div></div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const responses = [];
+let currentStep = 0;
+const formData = {
+  years: '', conflictTypes: [], conflictTypesOther: '',
+  q3: 0, q4: 0, q5: 0, q6: 0,
+  expectations: [], expectationsOther: '',
+  q8: '', agTensions: '', agTriggers: [], agTriggersOther: '',
+  unjustifiedReproaches: '', reproachesFocus: [], reproachesFocusOther: '',
+  personalAttack: '', borderlineBehavior: '',
+  impactAreas: [], conflictCosts: [], conflictCostsOther: '',
+  missingTools: [], missingToolsOther: ''
+};
+
+// ══════════════════════════════════════════════
+//  STEP DEFINITIONS
+// ══════════════════════════════════════════════
+const STEPS = [
+  {
+    title: "Profil syndic",
+    render: () => `
+      <div class="form-card">
+        <div class="q-label">Q1 — Depuis combien d'années exercez-vous en tant que syndic ?</div>
+        ${radioGroup('years', ['Moins de 5 ans','5-10 ans','+ 10 ans'])}
+      </div>`
+  },
+  {
+    title: "Types de conflits",
+    render: () => `
+      <div class="form-card">
+        <div class="q-label">Q2 — Quels types de conflits rencontrez-vous le plus souvent ?</div>
+        ${checkGroup('conflictTypes', [
+          'Entre copropriétaires (voisinage, nuisances, incivilités)',
+          'Entre copropriétaires et syndic',
+          'Entre copropriétaires et prestataires (plombier, peintre, chauffagiste...)'
+        ], 'conflictTypesOther')}
+      </div>`
+  },
+  {
+    title: "Perception des copropriétaires",
+    render: () => `
+      <div class="form-card">
+        ${likertQ('q3','Q3 — Les copropriétaires expriment clairement leur véritable besoin.')}
+        ${likertQ('q4','Q4 — Les demandes formulées ne correspondent pas toujours au besoin réel.')}
+        ${likertQ('q5','Q5 — Les copropriétaires cherchent avant tout à être écoutés et pris en charge.')}
+        ${likertQ('q6','Q6 — Les copropriétaires attendent principalement une solution immédiate.')}
+      </div>`
+  },
+  {
+    title: "Attentes & Besoins",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q7 — Les copropriétaires attendent principalement :</div>
+          ${checkGroup('expectations', ['Une solution rapide','Une reconnaissance de leur problème','Une écoute attentive','Une justification rationnelle'], 'expectationsOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q8 — Avez-vous déjà eu le sentiment qu'un conflit s'envenime parce qu'un copropriétaire a mal exprimé son besoin ?</div>
+          ${radioGroup('q8', ['Oui','Non'])}
+        </div>
+      </div>`
+  },
+  {
+    title: "Assemblées Générales",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q9 — Les Assemblées Générales sont-elles une source importante de tensions ?</div>
+          ${radioGroup('agTensions', ['Rarement','Occasionnellement','Fréquemment','Presque toujours'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q10 — Qu'est-ce qui déclenche le plus de tensions en AG ?</div>
+          ${checkGroup('agTriggers', ['Travaux','Charges','Confiance envers le syndic','Communication','Décisions mal comprises','Durée'], 'agTriggersOther')}
+        </div>
+      </div>`
+  },
+  {
+    title: "Reproches & Ressenti",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q11 — Vous arrive-t-il de recevoir des reproches que vous estimez injustifiés ?</div>
+          ${radioGroup('unjustifiedReproaches', ['Jamais','Parfois','Fréquemment','Presque toujours'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q12 — Ces reproches portent principalement sur :</div>
+          ${checkGroup('reproachesFocus', ['Votre temps de réaction','Votre disponibilité','Votre communication','La transparence','Le manque de solutions','La procédure en elle-même'], 'reproachesFocusOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q13 — Vous arrive-t-il de vous sentir personnellement attaqué(e) ?</div>
+          ${radioGroup('personalAttack', ['Oui','Non'])}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q14 — Avez-vous déjà eu le sentiment que certains conflits entrainent des comportements à la limite de la correction ?</div>
+          ${radioGroup('borderlineBehavior', ['Oui','Non'])}
+        </div>
+      </div>`
+  },
+  {
+    title: "Impact & Besoins non adressés",
+    render: () => `
+      <div class="form-card">
+        <div class="q-block">
+          <div class="q-label">Q15 — Les conflits impactent :</div>
+          ${checkGroup('impactAreas', ['Votre charge mentale','La motivation de votre équipe','La relation client','La rentabilité','Votre image'], null)}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q16 — Les conflits génèrent souvent :</div>
+          ${checkGroup('conflictCosts', ['Des heures non facturables','Des frais juridiques','Des tensions internes','Des pertes de clients'], 'conflictCostsOther')}
+        </div>
+        <div class="q-block">
+          <div class="q-label">Q17 — Qu'est-ce qui vous manque actuellement pour gérer les conflits ?</div>
+          ${checkGroup('missingTools', ['Du temps','Une procédure clairement définie','Des outils structurés','Des connaissances en gestion de conflits','Un conciliateur'], 'missingToolsOther')}
+        </div>
+      </div>`
+  }
+];
+
+// ══════════════════════════════════════════════
+//  FORM BUILDERS
+// ══════════════════════════════════════════════
+function radioGroup(key, options) {
+  return `<div class="radio-group">${options.map(v => `
+    <label class="choice-label ${formData[key]===v?'selected':''}" onclick="setRadio('${key}','${v}',this)">
+      <input type="radio" name="${key}" value="${v}" ${formData[key]===v?'checked':''}> ${v}
+    </label>`).join('')}</div>`;
+}
+
+function checkGroup(key, options, otherKey) {
+  const arr = formData[key] || [];
+  let html = `<div class="check-group">${options.map(v => `
+    <label class="choice-label ${arr.includes(v)?'selected':''}" onclick="toggleCheck('${key}','${v}',this)">
+      <input type="checkbox" value="${v}" ${arr.includes(v)?'checked':''}> ${v}
+    </label>`).join('')}`;
+  if (otherKey) {
+    const hasOther = arr.includes('Autre');
+    html += `
+    <div class="other-row">
+      <label class="choice-label ${hasOther?'selected':''}" onclick="toggleCheck('${key}','Autre',this)" style="white-space:nowrap">
+        <input type="checkbox" value="Autre" ${hasOther?'checked':''}> Autre :
+      </label>
+      <input class="other-input" placeholder="Précisez..." value="${formData[otherKey]||''}"
+        oninput="formData['${otherKey}']=this.value" ${hasOther?'':'disabled'} id="other-${otherKey}"/>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function likertQ(key, label) {
+  return `<div class="q-block">
+    <div class="q-label">${label}</div>
+    <div class="likert">
+      ${[1,2,3,4,5].map(n => `
+        <button class="likert-btn ${formData[key]===n?'sel':''}" data-v="${n}"
+          onclick="setLikert('${key}',${n},this)">${n}</button>`).join('')}
+      <span class="likert-hint">1 = Pas du tout · 5 = Totalement</span>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  FORM INTERACTION
+// ══════════════════════════════════════════════
+function setRadio(key, val, el) {
+  formData[key] = val;
+  el.closest('.radio-group').querySelectorAll('.choice-label').forEach(l => l.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleCheck(key, val, el) {
+  const arr = formData[key] || (formData[key] = []);
+  const idx = arr.indexOf(val);
+  if (idx >= 0) { arr.splice(idx, 1); el.classList.remove('selected'); }
+  else { arr.push(val); el.classList.add('selected'); }
+  // enable/disable other input
+  const otherInput = document.querySelector(`[id^="other-"]`);
+  if (val === 'Autre' && otherInput) otherInput.disabled = idx >= 0;
+}
+
+function setLikert(key, val, el) {
+  formData[key] = val;
+  el.closest('.likert').querySelectorAll('.likert-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+// ══════════════════════════════════════════════
+//  STEP NAV
+// ══════════════════════════════════════════════
+function renderStep() {
+  const n = STEPS.length;
+  // progress
+  const pb = document.getElementById('progress-bar');
+  pb.innerHTML = Array.from({length: n}, (_,i) =>
+    `<div class="progress-seg ${i<=currentStep?'done':''}"></div>`).join('');
+  document.getElementById('step-label').textContent = `Étape ${currentStep+1} / ${n}`;
+  document.getElementById('step-title').textContent = STEPS[currentStep].title;
+  document.getElementById('form-content').innerHTML = STEPS[currentStep].render();
+  document.getElementById('btn-prev').disabled = currentStep === 0;
+  const btnNext = document.getElementById('btn-next');
+  if (currentStep === n - 1) {
+    btnNext.textContent = '✓ Soumettre';
+    btnNext.className = 'btn btn-success';
+    btnNext.onclick = submitForm;
+  } else {
+    btnNext.textContent = 'Suivant →';
+    btnNext.className = 'btn btn-primary';
+    btnNext.onclick = nextStep;
+  }
+}
+
+function nextStep() { if (currentStep < STEPS.length - 1) { currentStep++; renderStep(); } }
+function prevStep() { if (currentStep > 0) { currentStep--; renderStep(); } }
+
+function submitForm() {
+  responses.push(JSON.parse(JSON.stringify(formData)));
+  // reset
+  Object.assign(formData, {
+    years:'', conflictTypes:[], conflictTypesOther:'',
+    q3:0, q4:0, q5:0, q6:0,
+    expectations:[], expectationsOther:'',
+    q8:'', agTensions:'', agTriggers:[], agTriggersOther:'',
+    unjustifiedReproaches:'', reproachesFocus:[], reproachesFocusOther:'',
+    personalAttack:'', borderlineBehavior:'',
+    impactAreas:[], conflictCosts:[], conflictCostsOther:'',
+    missingTools:[], missingToolsOther:''
+  });
+  currentStep = 0;
+  updateNavCounts();
+  // success screen
+  document.getElementById('form-content').innerHTML = `
+    <div class="success-screen">
+      <div class="icon">✅</div>
+      <h2>Réponse enregistrée !</h2>
+      <p>Redirection vers le tableau de bord…</p>
+    </div>`;
+  document.getElementById('step-label').textContent = '';
+  document.getElementById('step-title').textContent = '';
+  document.getElementById('progress-bar').innerHTML = '';
+  document.getElementById('btn-prev').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  setTimeout(() => {
+    document.getElementById('btn-prev').style.display = '';
+    document.getElementById('btn-next').style.display = '';
+    renderStep();
+    showPage('dashboard');
+  }, 2000);
+}
+
+// ══════════════════════════════════════════════
+//  PAGE SWITCHING
+// ══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const tabMap = {form:0, dashboard:1, data:2};
+  document.querySelectorAll('.nav-tab')[tabMap[id]].classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'data') renderTable();
+}
+
+function updateNavCounts() {
+  document.getElementById('tab-dashboard').textContent = `📊 Analyse (${responses.length})`;
+  document.getElementById('tab-data').textContent = `🗃️ Données (${responses.length})`;
+  document.getElementById('data-count').textContent =
+    responses.length ? `${responses.length} réponse${responses.length>1?'s':''} collectée${responses.length>1?'s':''}` : 'Aucune réponse';
+}
+
+// ══════════════════════════════════════════════
+//  STATS HELPERS
+// ══════════════════════════════════════════════
+function avg(key) {
+  if (!responses.length) return 0;
+  return responses.reduce((s,r) => s + (r[key]||0), 0) / responses.length;
+}
+function pct(pred) {
+  if (!responses.length) return 0;
+  return Math.round(responses.filter(pred).length / responses.length * 100);
+}
+function countValues(key) {
+  const map = {};
+  responses.forEach(r => {
+    const v = r[key];
+    if (Array.isArray(v)) v.forEach(x => { map[x] = (map[x]||0)+1; });
+    else if (v) map[v] = (map[v]||0)+1;
+  });
+  return Object.entries(map).sort((a,b) => b[1]-a[1]);
+}
+function hbar(data, color, total) {
+  if (!data.length) return '<p style="color:var(--dim);font-size:13px">Pas encore de données.</p>';
+  const t = total || responses.length;
+  return `<div class="hbar">${data.map(([label, count]) => {
+    const p = t ? Math.round(count/t*100) : 0;
+    return `<div class="hbar-row">
+      <div class="hbar-labels"><span>${label}</span><span style="color:${color}">${p}%</span></div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${p}%;background:${color}"></div></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function lscoreRow(label, val) {
+  const p = (val/5)*100;
+  const color = p < 40 ? 'var(--red)' : p < 70 ? 'var(--gold)' : 'var(--green)';
+  return `<div class="lscore-row">
+    <span class="lscore-label">${label}</span>
+    <div class="lscore-right">
+      <div class="lscore-bar"><div class="lscore-fill" style="width:${p}%;background:${color}"></div></div>
+      <span class="lscore-val" style="color:${color}">${val.toFixed(1)}</span>
+    </div>
+  </div>`;
+}
+function statCard(label, val, icon, color, sub) {
+  return `<div class="stat-card" style="border-left-color:${color}">
+    <span class="icon">${icon}</span>
+    <small>${label}</small>
+    <div class="val" style="color:${color}">${val}</div>
+    ${sub ? `<div class="sub">${sub}</div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  DASHBOARD RENDER
+// ══════════════════════════════════════════════
+function renderDashboard() {
+  const n = responses.length;
+  const el = document.getElementById('dashboard-content');
+
+  if (!n) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="icon">📭</div>
+      <h2>Aucune réponse encore</h2>
+      <p>Remplissez le questionnaire pour voir les statistiques apparaître ici.</p>
+      <button class="btn btn-primary" onclick="showPage('form')">Remplir le questionnaire</button>
+    </div>`;
+    return;
+  }
+
+  const pctAttack   = pct(r => r.personalAttack === 'Oui');
+  const pctBorder   = pct(r => r.borderlineBehavior === 'Oui');
+  const pctBadExpr  = pct(r => r.q8 === 'Oui');
+  const pctConc     = pct(r => (r.missingTools||[]).includes('Un conciliateur'));
+  const pctProcedure= pct(r => (r.missingTools||[]).includes('Une procédure clairement définie'));
+  const pctKnow     = pct(r => (r.missingTools||[]).includes('Des connaissances en gestion de conflits'));
+
+  const impactTop2 = countValues('impactAreas').slice(0,2).map(([l])=>l.toLowerCase());
+
+  el.innerHTML = `
+    <!-- KPI Banner -->
+    <div class="dash-header">
+      <div><h1>Tableau de bord analytique</h1><p>${n} réponse${n>1?'s':''} · Données en temps réel</p></div>
+      <button class="btn btn-outline" onclick="exportCSV()">⬇ Exporter CSV</button>
+    </div>
+    <div class="kpi-banner">
+      <div class="kpi-main">
+        <small>Répondants</small>
+        <div class="big-num">${n}</div>
+        <span>syndics interrogés</span>
+      </div>
+      <div class="kpi-pills">
+        <div class="kpi-pill"><div class="val" style="color:var(--red)">${pctAttack}%</div><div class="lbl">Se sentent attaqués</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--gold)">${pctBorder}%</div><div class="lbl">Comportements limites</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--accent-soft)">${pctBadExpr}%</div><div class="lbl">Besoin mal exprimé</div></div>
+        <div class="kpi-pill"><div class="val" style="color:var(--green)">${pctConc}%</div><div class="lbl">Veulent un conciliateur</div></div>
+      </div>
+    </div>
+
+    <!-- 1. Profil -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--accent-soft)"></div><h3>1. Profil des répondants</h3></div>
+      ${hbar(countValues('years'), 'var(--accent-soft)')}
+    </div>
+
+    <!-- 2. Sources de conflits -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--red)"></div><h3>2. Principales sources de conflits</h3></div>
+      ${hbar(countValues('conflictTypes'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">🏛️ Fréquence des tensions en AG</p>
+        ${hbar(countValues('agTensions'), 'var(--gold)')}
+      </div>
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">⚡ Déclencheurs de tensions en AG</p>
+        ${hbar(countValues('agTriggers'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 3. Gestion actuelle -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--gold)"></div><h3>3. Comment ces conflits sont gérés aujourd'hui</h3></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Alignement perception / réalité (échelle 1–5)</p>
+      <div class="likert-summary">
+        ${lscoreRow("Clarté d'expression des besoins (Q3)", avg('q3'))}
+        ${lscoreRow("Décalage demande / besoin réel (Q4)", avg('q4'))}
+        ${lscoreRow("Besoin d'écoute avant tout (Q5)", avg('q5'))}
+        ${lscoreRow("Attente d'une solution immédiate (Q6)", avg('q6'))}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Fréquence des reproches injustifiés</p>
+      ${hbar(countValues('unjustifiedReproaches'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Portée des reproches</p>
+        ${hbar(countValues('reproachesFocus'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 4. Conséquences -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--red)"></div><h3>4. Conséquences sur le travail des syndics</h3></div>
+      <div class="card-grid">
+        ${statCard('Se sentent attaqués personnellement', pctAttack+'%', '😤', 'var(--red)', 'des répondants')}
+        ${statCard('Comportements limites vécus', pctBorder+'%', '⚠️', 'var(--gold)', 'des répondants')}
+        ${statCard('Conflit aggravé par besoin mal exprimé', pctBadExpr+'%', '💬', 'var(--accent-soft)', 'ont répondu Oui')}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Domaines impactés</p>
+      ${hbar(countValues('impactAreas'), 'var(--red)')}
+      <div style="margin-top:24px">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Coûts générés par les conflits</p>
+        ${hbar(countValues('conflictCosts'), 'var(--gold)')}
+      </div>
+    </div>
+
+    <!-- 5. Besoins non adressés -->
+    <div class="section">
+      <div class="section-head"><div class="section-bar" style="background:var(--green)"></div><h3>5. Besoins peu ou mal adressés</h3></div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ce qui manque actuellement</p>
+      ${hbar(countValues('missingTools'), 'var(--green)')}
+      <div class="card-grid" style="margin-top:24px">
+        ${statCard('Souhaitent un conciliateur', pctConc+'%', '🤝', 'var(--green)', 'besoin clé identifié')}
+        ${statCard('Manque de procédure définie', pctProcedure+'%', '📋', 'var(--accent-soft)', 'besoin structurel')}
+        ${statCard('Manque de formation conflits', pctKnow+'%', '📚', 'var(--gold)', 'besoin de compétences')}
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Attentes des copropriétaires selon les syndics</p>
+      ${hbar(countValues('expectations'), 'var(--green)')}
+      <div class="insight-box">
+        <strong>💡 Insight principal</strong>
+        <p>${pctConc > 50
+          ? `Plus de la moitié des syndics (${pctConc}%) expriment le besoin d'un conciliateur externe — un signal fort pour la pertinence d'un service de médiation.`
+          : `${pctConc}% des répondants mentionnent le besoin d'un conciliateur, à combiner avec les autres besoins structurels identifiés.`}
+          ${impactTop2.length ? ` Les conflits impactent en priorité : ${impactTop2.join(' et ')}.` : ''}</p>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  RAW TABLE
+// ══════════════════════════════════════════════
+function renderTable() {
+  const el = document.getElementById('table-content');
+  if (!responses.length) {
+    el.innerHTML = '<p style="padding:40px;color:var(--muted);text-align:center">Aucune donnée pour l\'instant.</p>';
+    return;
+  }
+  const cols = ['#','Expérience','Types conflits','Q3','Q4','Q5','Q6','Attentes','AG','Attaqué','Limites'];
+  el.innerHTML = `<table>
+    <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+    <tbody>${responses.map((r,i) => {
+      const scoreColor = v => v>=4?'var(--green)':v>=3?'var(--gold)':'var(--red)';
+      const tag = (v, yes='Oui') => `<span class="tag" style="background:${v===yes?'#E8615A22':'#3ECFB222'};color:${v===yes?'var(--red)':'var(--green)'}">${v||'—'}</span>`;
+      return `<tr>
+        <td style="color:var(--dim)">${i+1}</td>
+        <td>${r.years||'—'}</td>
+        <td style="max-width:180px">${(r.conflictTypes||[]).join(', ').substring(0,55)||'—'}</td>
+        ${['q3','q4','q5','q6'].map(k => `<td style="text-align:center;font-weight:700;color:${scoreColor(r[k])}">${r[k]||'—'}</td>`).join('')}
+        <td style="max-width:160px">${(r.expectations||[]).join(', ').substring(0,50)||'—'}</td>
+        <td>${r.agTensions||'—'}</td>
+        <td>${tag(r.personalAttack)}</td>
+        <td>${tag(r.borderlineBehavior)}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ══════════════════════════════════════════════
+//  CSV EXPORT
+// ══════════════════════════════════════════════
+function exportCSV() {
+  if (!responses.length) { alert('Aucune donnée à exporter.'); return; }
+  const keys = Object.keys(responses[0]);
+  const header = keys.join(';');
+  const rows = responses.map(r =>
+    keys.map(k => {
+      const v = r[k];
+      return Array.isArray(v) ? `"${v.join(', ')}"` : `"${v||''}"`;
+    }).join(';')
+  );
+  const csv = '\uFEFF' + [header, ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'syndic_conflits_donnees.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+renderStep();
+</script>
+</body>
+</html>
