@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/syndic-conflicts.html" }
+  ]
+}
